@@ -1,0 +1,795 @@
+{
+  "name": "NN 字幕國際工廠 時間線整理   final",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1Ks73PBFk_rLsoQk67zJNaqGY-54bRk0L",
+          "mode": "list",
+          "cachedResultName": "字幕上傳",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1Ks73PBFk_rLsoQk67zJNaqGY-54bRk0L"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        176,
+        976
+      ],
+      "id": "0ddf5d87-a9d7-4348-9979-c53e27a3476b",
+      "name": "偵測檔案1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XnPHSW1w9UdQGCC9",
+          "name": "(NN) Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f355e215-5f7e-4da2-9703-1e2324a48767",
+              "leftValue": "={{ $json.fileExtension }}",
+              "rightValue": "srt",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "a9ebcbb8-5ef1-4f88-bfd3-88f48b60d72a",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        976
+      ],
+      "id": "db003299-643c-4e21-82b0-a17f838a59e1",
+      "name": "只處理srt檔案1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f355e215-5f7e-4da2-9703-1e2324a48767",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "(已處理)",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        960
+      ],
+      "id": "bca0388d-a64a-4573-a70b-2cf81feefb78",
+      "name": "只處理沒有(已處理)檔案"
+    },
+    {
+      "parameters": {
+        "operation": "__CUSTOM_API_CALL__"
+      },
+      "id": "860a332d-e800-4efa-8c6b-cb7310c4f637",
+      "name": "抓影片數據1",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        1120
+      ],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "i1HMgRgRna67XRJI",
+          "name": "(NN) YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/channels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "contentDetails"
+            },
+            {
+              "name": "mine",
+              "value": "true"
+            },
+            {
+              "name": "fields",
+              "value": "items/contentDetails/relatedPlaylists"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1872,
+        1120
+      ],
+      "id": "22377af8-542f-4a34-8874-565e23a50490",
+      "name": "搜尋頻道清單",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "F5bfKG8H3QSCACbE",
+          "name": "(NN) Youtube影片清單"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/playlistItems",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            },
+            {
+              "name": "playlistId",
+              "value": "={{ $json.items[0].contentDetails.relatedPlaylists.uploads }}"
+            },
+            {
+              "name": "maxResults",
+              "value": "10"
+            },
+            {
+              "name": "fields",
+              "value": "items/snippet"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2032,
+        1120
+      ],
+      "id": "d7a0192b-25d4-452a-a417-fc4557c98dfd",
+      "name": "搜尋頻道清單3",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "F5bfKG8H3QSCACbE",
+          "name": "(NN) Youtube影片清單"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "update",
+        "videoId": "={{ $('抓出需要處理的影片1').item.json.videoId }}",
+        "title": "={{ $('抓出需要處理的影片1').item.json.title }}",
+        "regionCode": "TW",
+        "categoryId": "25",
+        "updateFields": {
+          "description": "={{ $json.message.content }}",
+          "embeddable": true,
+          "tags": "nownews,新聞,娛樂,娛樂新聞,NOW娛樂,政治,鄉民大學問,時事,國際,體育,運動"
+        }
+      },
+      "id": "42210965-9ae8-4588-808f-49006f990582",
+      "name": "更新說明欄1",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        1360
+      ],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "i1HMgRgRna67XRJI",
+          "name": "(NN) YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $node[\"偵測檔案1\"].json[\"id\"] }}",
+          "mode": "id"
+        },
+        "newUpdatedFileName": "={{ \"(已處理)\" + $node[\"偵測檔案1\"].json[\"name\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1840,
+        1360
+      ],
+      "id": "d4d33a3a-018e-4f5d-b5b8-19bbac4a0ab2",
+      "name": "更新檔名1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XnPHSW1w9UdQGCC9",
+          "name": "(NN) Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 取得上傳的檔案資訊\nconst latestFile = $node[\"只處理最新上傳的1\"].json;\nlet rawFilename = latestFile.name || \"\";\n\n// 1. 清除副檔名與常見字眼\nrawFilename = rawFilename\n  .replace(/\\.(srt|mp4)(\\.srt)?$/i, \"\")\n  .replace(/(\\(已處理\\))?\\s*字幕.*$/i, \"\")\n  .replace(/^20\\d{6}_/, \"\")\n  .trim();\n\n// 2. 優化後的正規化函數（保留空格以利切分關鍵字）\nconst normalize = str =>\n  str\n    .replace(/[《》「」『』〈〉‹›«»【】]/g, \" \") // 括號轉空格\n    .replace(/[／，。：；？！?,.%]/g, \" \")      // 標點轉空格\n    .replace(/[　]/g, \" \")\n    .toLowerCase()\n    .trim();\n\nconst fileKey = normalize(rawFilename);\n\n// 3. 提取關鍵詞（將長標題切碎）\nconst extractKeywords = str =>\n  str.split(/\\s+/)\n     .filter(k => k.length >= 2); // 只取長度大於 2 的詞\n\nconst keywords = extractKeywords(fileKey);\n\n// 4. 取得影片清單\nconst allVideos = $node[\"搜尋頻道清單3\"].json.items;\n\n// 5. 執行模糊比對\nlet matched = null;\nlet maxHitScore = 0;\n\nfor (const v of allVideos) {\n  const title = v.snippet.title || \"\";\n  const normTitle = normalize(title);\n  \n  // 計算命中了多少個關鍵字\n  const hits = keywords.filter(k => normTitle.includes(k));\n  const score = hits.length / keywords.length;\n\n  // 如果命中超過 30% 且比之前的更高，就暫定為這部\n  if (score >= 0.3 && score > maxHitScore) {\n    maxHitScore = score;\n    matched = v;\n  }\n  \n  // 如果完全包含，直接判定成功\n  if (normTitle.includes(fileKey.replace(/\\s+/g, \"\")) || fileKey.replace(/\\s+/g, \"\").includes(normTitle.replace(/\\s+/g, \"\"))) {\n    matched = v;\n    break;\n  }\n}\n\n// 6. 錯誤處理與日誌\nif (!matched) {\n  console.log(\"搜尋關鍵字為:\", keywords);\n  throw new Error(`❌ 無法匹配影片。檔名：${rawFilename}。請檢查 YouTube 標題是否差異過大，或增加搜尋數量。`);\n}\n\nreturn [{\n  json: {\n    videoId     : matched.snippet.resourceId.videoId,\n    title       : matched.snippet.title,\n    description : matched.snippet.description,\n    matchScore  : maxHitScore\n  }\n}];"
+      },
+      "id": "45ef6f6c-644f-4bd0-b370-d94ba2bdddd8",
+      "name": "抓出需要處理的影片1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        1360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// items 是所有偵測到的檔案\nlet latest = items[0];\n\nfor (const item of items) {\n  const currTime = new Date(item.json.createdTime).getTime();\n  const latestTime = new Date(latest.json.createdTime).getTime();\n  \n  if (currTime > latestTime) {\n    latest = item;\n  }\n}\n\n// 只輸出最新的一筆檔案\nreturn [latest];\n"
+      },
+      "id": "2572e9e3-a201-43f4-8ef5-54ce161318cd",
+      "name": "只處理最新上傳的1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const srtText = $json[\"message\"][\"content\"];\nreturn [\n  {\n    binary: {\n      srtFile: {\n        data: Buffer.from(srtText, 'utf-8').toString('base64'),\n        mimeType: 'text/plain',\n        fileName: '英文字幕.srt'\n      }\n    }\n  }\n];\n"
+      },
+      "id": "5f7b4c5b-e7b0-42e5-acff-532dedae0902",
+      "name": "轉成srt檔案1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// 獲取目前的 item\nconst item = $input.item;\n\n// 檢查是否存在名為 'data' 的二進位欄位 (這是「下載檔案1」輸出的預設名稱)\nif (!item.binary || !item.binary.data) {\n  throw new Error('找不到二進位檔案數據，請檢查「下載檔案1」節點的輸出名稱是否為 data');\n}\n\n// 使用 n8n 推薦的新版方式獲取 Buffer\n// 如果您的 n8n 版本非常新，可以直接用這種方式解析文字：\nconst srtContent = await this.helpers.getBinaryDataBuffer(0, 'data').then(buf => buf.toString('utf8'));\n\n// 將 SRT 字幕逐段解析\nconst subtitles = [];\nconst lines = srtContent.split(/\\r?\\n/); // 相容不同系統的換行符號\n\nlet timestamp = '';\nlet text = '';\n\nlines.forEach(line => {\n  if (line.includes('-->')) {\n    if (timestamp && text) {\n      const cleanText = text.trim().replace(/\\d+$/, '').trim();\n      subtitles.push({ timestamp, text: cleanText });\n    }\n    timestamp = line.trim();\n    text = '';\n  } else if (line.trim() !== '' && !/^\\d+$/.test(line.trim())) { // 排除只有數字的行號\n    text += line.trim() + ' ';\n  }\n});\n\n// 收尾補上最後一段\nif (timestamp && text) {\n  const cleanText = text.trim().replace(/\\d+$/, '').trim();\n  subtitles.push({ timestamp, text: cleanText });\n}\n\n// 組合成乾淨的 SRT 純文字\nconst srtText = subtitles.map((line, index) => {\n  return `${index + 1}\\n${line.timestamp}\\n${line.text}\\n`;\n}).join('\\n');\n\nreturn {\n  json: {\n    srtText\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        1024
+      ],
+      "id": "e2e7e450-2c4e-4e03-a5af-0cc7ad5e8581",
+      "name": "解析 SRT1"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "srtFile",
+        "name": "={{\"英文.\" + $node[\"只處理最新上傳的1\"].json[\"name\"] }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1RhVW7KSuw8gMBaOQ6KDtHGxuRSgVffDB",
+          "mode": "list",
+          "cachedResultName": "英文字幕",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1RhVW7KSuw8gMBaOQ6KDtHGxuRSgVffDB"
+        },
+        "options": {}
+      },
+      "id": "c6628052-52a7-49b5-a692-75139e4c3b19",
+      "name": "上傳檔案1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1648,
+        944
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XnPHSW1w9UdQGCC9",
+          "name": "(NN) Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        864,
+        1024
+      ],
+      "id": "cee9a190-ecf6-45ff-8d34-05cf458d84b6",
+      "name": "下載檔案1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XnPHSW1w9UdQGCC9",
+          "name": "(NN) Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"C2bbdb4ab38074b0fa87a3ec4e4f5b4e3\",\n  \"messages\": [\n    {\n      \"type\": \"flex\",\n      \"altText\": \"✅ 影片處理完成\",\n      \"contents\": {\n        \"type\": \"bubble\",\n        \"header\": {\n          \"type\": \"box\",\n          \"layout\": \"vertical\",\n          \"backgroundColor\": \"#07B53B\",\n          \"contents\": [\n            {\n              \"type\": \"text\",\n              \"text\": \"字幕翻譯任務完成\",\n              \"color\": \"#ffffff\",\n              \"weight\": \"bold\",\n              \"size\": \"sm\"\n            }\n          ]\n        },\n        \"body\": {\n          \"type\": \"box\",\n          \"layout\": \"vertical\",\n          \"contents\": [\n            {\n              \"type\": \"text\",\n              \"text\": \"🎬 影片標題\",\n              \"size\": \"xs\",\n              \"color\": \"#888888\",\n              \"weight\": \"bold\"\n            },\n            {\n              \"type\": \"text\",\n              \"text\": {{ JSON.stringify($('抓出需要處理的影片1').first().json.title) }},\n              \"wrap\": true,\n              \"margin\": \"sm\",\n              \"size\": \"sm\"\n            },\n            {\n              \"type\": \"separator\",\n              \"margin\": \"md\"\n            },\n            {\n              \"type\": \"text\",\n              \"text\": \"檔案已就緒，請點擊下方按鈕下載。\",\n              \"size\": \"xs\",\n              \"color\": \"#444444\",\n              \"margin\": \"md\",\n              \"wrap\": true\n            }\n          ]\n        },\n        \"footer\": {\n          \"type\": \"box\",\n          \"layout\": \"vertical\",\n          \"contents\": [\n            {\n              \"type\": \"button\",\n              \"style\": \"primary\",\n              \"color\": \"#07B53B\",\n              \"height\": \"sm\",\n              \"action\": {\n                \"type\": \"uri\",\n                \"label\": \"📥 下載英文 SRT\",\n                \"uri\": \"https://drive.google.com/uc?export=download&id={{ $('上傳檔案1').item.json.id }}\"\n              }\n            }\n          ]\n        }\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "7d1ed6b8-f9e7-4e6d-93cb-b34a45254186",
+      "name": "LINE通知",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        1168
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "WbmjPhnwVW5150x6",
+          "name": "n8n字幕流程通知"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42eb3830-0bb8-4e36-a70e-bc92464e91a3",
+              "name": "timelineTitle",
+              "value": "={{ $json.message.content.split('\\n')[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "e243e4ce-dfa0-4b56-9ff6-aa41ea846d59",
+              "name": "timelineBody",
+              "value": "={{ $json.message.content.split('\\n').slice(1).join('\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bfa63997-c7dd-4733-98a7-0000171790e6",
+      "name": "分離主旨與時間軸",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1520,
+        1120
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=這是一段新聞報導，並無不當或敏感內容。假設你是一位專業的翻譯與字幕轉換專家，請將以下的中文字幕字幕（SRT 格式）翻譯成英文語言版本：英文（English））。請保留 SRT 原始格式，包括字幕編號、時間軸。\n\n⚠️ 每段字幕要對應相同時間軸，不可重組或合併。\n⚠️ 請注意語法正確、自然流暢，符合新聞內容的語境。\n⚠️ 請務必使用正確的專有名詞翻譯，例如：「新北大橋」請翻譯為「New Taipei Bridge」，不可用「Xinbei Bridge」。\n⚠️ 不需輸出任何說明或多餘的解釋、陣列數字，一開始就直接是時間戳開始的srt格式就好，不要有多餘的類似像```srt、srt\\n的形式在結果最開頭或是最結尾出現。\n\n以下是要翻譯的中文字幕：\n{{ $json.srtText }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e9af8c3d-21b9-493f-a1fc-019e91a893cd",
+      "name": "翻譯3",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1184,
+        944
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "SurDrPrkGuJWzfOV",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=你是一位資深新聞媒體文字工作者，擅長以影片字幕撰寫 SEO 友善的 YouTube 說明欄時間軸摘要\n請閱讀提供的 SRT 字幕內容，挑選重點並輸出格式化摘要\n\n⚠️ 請嚴格遵守以下格式與規則：\n1. 僅允許使用【繁體中文】，不得出現任何簡體字\n2. 若有簡體字詞，自動轉換為正體中文詞彙再輸出\n3. 不得使用任何 \\n、\\r 或 HTML 標籤換行\n4. 每段內容請用「實際換行」（Enter）分行\n5. 每行開頭不得出現任何符號、標點或英文字母\n\n第一階段（主旨摘要）規則如下:\n- 請用一句話概括影片的主題、主角與關鍵事件\n- 內容需精簡扼要，不超過 25 個繁體中文字\n- 句子結構自然，可使用標點符號\n- 僅允許使用純繁體中文，不可使用簡體字\n- 嚴禁換行，輸出為單一行文字\n- 主題請參考：{{ $('偵測檔案1').item.json.name }}\n\n第二階段（時間軸摘要）規則如下：\n- 摘要影片中最具代表性的段落，每段 1 句為主，必要時最多 2 句\n- 每句話 **不得超過 20 個中文字**，務必「簡潔扼要」、「聚焦重點」\n- 使用字幕「開始時間」作為時間碼，格式為 MM:SS（省略小時與毫秒）\n- 每段格式為：MM:SS 內容摘要\n- 每段結尾不得有標點\n- 每段獨立一行，不可有空行\n- 摘要時間碼必須依照原始 SRT 檔案順序排列，不能重排\n- **嚴禁輸出時間碼為 00:00 的段落**\n\n✅ 最後一段時間碼不得早於前一段時間碼，時間碼必須持續遞增\n\n✅ 請依照以下【格式範例】排版（模仿排版即可，禁止照抄內容）：\n\n淘寶拼多多未落地繼續販售，經濟部長表態不支持\n\n00:03 台灣非洲豬瘟破功與小包裹有關  \n00:09 淘寶未設公司難以依法管理  \n00:14 龔明鑫說明監管困難  \n00:21 立委指出淘寶只發傳單未經營  \n00:39 批評實際運作與法律脫節  \n01:33 商業署說明核准範圍有限  \n01:42 民眾多直接在中國平台購物  \n\n📌 請產出與上方格式一致的摘要結果，但根據我提供的字幕內容生成。\n📌 輸出時禁止出現「第一階段」、「第二階段」等標題文字，也禁止模仿這些提示語。\n\n以下是字幕內容：\n{{ $json.srtText }}\n\n請依據上方規則輸出摘要結果\n\n"
+            },
+            {
+              "content": "你必須強制使用【繁體中文】即使使用者未要求也不能顯示簡體字 若有簡體詞請自動轉換為繁體詞",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "83104534-3cf8-41be-baf1-833285af3d2d",
+      "name": "分析時間軸重點",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1184,
+        1120
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "SurDrPrkGuJWzfOV",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=你現在是一位專業的翻譯員與內容編輯。\n\n我會提供一段 YouTube 說明欄的原始內容，請你根據以下規則處理，所有規則必須嚴格執行，任何違規都不被接受：\n\n1. 說明欄第一段為「主文」，請完整保留原始中文文字（不能刪減、改寫或加註），前面不得添加任何格式或符號。\n2. 主文段落正下方（不中斷、不空行）直接接上英文翻譯，風格自然、忠實、清楚，翻譯最後加註（此翻譯來源：ChatGPT）。\n3. 若出現 hashtag 區塊（#開頭），請完整保留其原樣、順序與排版。\n4. 在 hashtag 區塊下方插入以下「時間軸摘要內容」，請嚴格保留每一行的原始內容與順序：\n\n⚠️ timelineTitle 是主旨摘要，為時間軸的第一行，雖然沒有時間碼，但**必須保留、不得跳過或合併進其他段落**\n⚠️ timelineBody 是時間軸內容，含時間碼，請逐行換行顯示，**不可合併為段落或改寫格式**\n\n📌 在插入時間軸前，**請於 hashtag 區塊與時間軸之間插入一個空行**\n📌 若時間軸後方還有「詳細報導」、「NOWNEWS」等宣傳段落，請再插入一個空行作為分隔\n\n👉 以下為時間軸摘要內容（請完整插入，不可遺漏）：\n{{ '\\n' + $('分離主旨與時間軸').item.json.timelineTitle + '\\n' + $('分離主旨與時間軸').item.json.timelineBody + '\\n' }}\n\n\n\n5. 之後若出現「詳細報導」、「NOWNEWS」等宣傳段落，請接在時間軸之後，保持原格式、順序與換行。\n\n⚠️ 嚴禁以下行為：\n- 不可重寫、刪減或調整 timelineTitle\n- 不可改動 timelineBody 的段落內容或順序\n- 不可合併任何段落或自動換行\n- 不可使用 markdown（如 *、```、#）\n\n以下是原始說明欄內容：\n\"\"\"\n{{ $json.description }}\n\"\"\""
+            },
+            {
+              "content": "=你是一位專業的內容處理器與翻譯助手，專責處理 YouTube 說明欄格式與中英翻譯。\n\n請遵守以下行為原則：\n\n1. 你是格式與翻譯工具，不是文字創作人。\n2. 不得「理解」、「改寫」、「優化」任何我提供的文字，僅能照指令處理格式與翻譯。\n3. 若有時間軸、摘要、標題等文字，請保留原樣、逐行輸出，嚴格禁止修改。\n4. 若需翻譯，只能翻譯我指示的段落，其餘內容一律原樣保留。\n5. 不得補充任何語句、段落、標點，也不得重組或合併段落。\n6. 保留所有換行與格式，輸出內容必須完全符合輸入格式結構。\n7. 你不可判斷輸入是否合理，也不能優化句意或調整結構。\n\n這是一個格式穩定性任務，請以**精準、嚴謹、格式穩定**為最高原則執行每次指令。\n",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "44f669ac-61e3-423d-a7fb-c1a477553841",
+      "name": "翻譯",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1312,
+        1360
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "SurDrPrkGuJWzfOV",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2448,
+        1168
+      ],
+      "id": "b1e1a717-cc6e-4988-850c-2da157b39c35",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "偵測檔案1": {
+      "main": [
+        [
+          {
+            "node": "只處理最新上傳的1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "只處理srt檔案1": {
+      "main": [
+        [
+          {
+            "node": "只處理沒有(已處理)檔案",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "只處理沒有(已處理)檔案": {
+      "main": [
+        [],
+        [
+          {
+            "node": "下載檔案1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "抓影片數據1": {
+      "main": [
+        [
+          {
+            "node": "搜尋頻道清單",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "搜尋頻道清單": {
+      "main": [
+        [
+          {
+            "node": "搜尋頻道清單3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "搜尋頻道清單3": {
+      "main": [
+        [
+          {
+            "node": "抓出需要處理的影片1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "更新說明欄1": {
+      "main": [
+        [
+          {
+            "node": "更新檔名1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "抓出需要處理的影片1": {
+      "main": [
+        [
+          {
+            "node": "翻譯",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "只處理最新上傳的1": {
+      "main": [
+        [
+          {
+            "node": "只處理srt檔案1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "轉成srt檔案1": {
+      "main": [
+        [
+          {
+            "node": "上傳檔案1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "解析 SRT1": {
+      "main": [
+        [
+          {
+            "node": "翻譯3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "分析時間軸重點",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "下載檔案1": {
+      "main": [
+        [
+          {
+            "node": "解析 SRT1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "更新檔名1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "分離主旨與時間軸": {
+      "main": [
+        [
+          {
+            "node": "抓影片數據1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "翻譯3": {
+      "main": [
+        [
+          {
+            "node": "轉成srt檔案1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "分析時間軸重點": {
+      "main": [
+        [
+          {
+            "node": "分離主旨與時間軸",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "翻譯": {
+      "main": [
+        [
+          {
+            "node": "更新說明欄1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LINE通知": {
+      "main": [
+        []
+      ]
+    },
+    "上傳檔案1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "LINE通知",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "vPlmpVgGz96dpLcF"
+  },
+  "versionId": "754ce694-1d10-40a2-acdc-65540e4a2162",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c69dd2597370f5826ae20c1a948b264d03399fec2875780a8757da55e519fbc2"
+  },
+  "id": "v4IGpa4qOKNs8sfQ",
+  "tags": []
+}
