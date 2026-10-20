@@ -13,10 +13,10 @@
         "triggerOn": "specificFolder",
         "folderToWatch": {
           "__rl": true,
-          "value": "1Ks73PBFk_rLsoQk67zJNaqGY-54bRk0L",
+          "value": "<資料夾ID>",
           "mode": "list",
           "cachedResultName": "字幕上傳",
-          "cachedResultUrl": "https://drive.google.com/drive/folders/1Ks73PBFk_rLsoQk67zJNaqGY-54bRk0L"
+          "cachedResultUrl": "https://drive.google.com/drive/folders/<資料夾ID>"
         },
         "event": "fileCreated",
         "options": {}
@@ -333,10 +333,10 @@
         },
         "folderId": {
           "__rl": true,
-          "value": "1RhVW7KSuw8gMBaOQ6KDtHGxuRSgVffDB",
+          "value": "<資料夾ID>",
           "mode": "list",
           "cachedResultName": "英文字幕",
-          "cachedResultUrl": "https://drive.google.com/drive/folders/1RhVW7KSuw8gMBaOQ6KDtHGxuRSgVffDB"
+          "cachedResultUrl": "https://drive.google.com/drive/folders/<資料夾ID>"
         },
         "options": {}
       },
